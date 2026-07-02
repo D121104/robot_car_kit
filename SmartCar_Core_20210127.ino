@@ -11,11 +11,11 @@
 #include <Servo.h>
 #include <stdio.h>
 
-#define f 16736925 // FORWARD
-#define b 16754775 // BACK
-#define l 16720605 // LEFT
-#define r 16761405 // RIGHT
-#define s 16712445 // STOP
+#define f 1286666973 // FORWARD
+#define b 2747854299 // BACK
+#define l 1386468383 // LEFT
+#define r 553536955  // RIGHT
+#define s 16712445   // STOP
 
 #define UNKNOWN_F 5316027    // FORWARD
 #define UNKNOWN_B 2747854299 // BACK
@@ -56,7 +56,7 @@ const int ObstacleDetection = 35;
 #define LineTeacking_Read_Middle !digitalRead(4) // Middle
 #define LineTeacking_Read_Left !digitalRead(2)   // Left
 
-#define carSpeed 150 // PWM(Motor speed/Speed)
+#define carSpeed 250 // PWM(Motor speed/Speed)
 
 unsigned int carSpeed_rocker = 250;
 #define PIN_Servo 3
@@ -179,11 +179,11 @@ void left(bool debug, int16_t in_carSpeed) {
 
   analogWrite(ENA, in_carSpeed);
   analogWrite(ENB, in_carSpeed);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
 
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
   if (debug)
     Serial.println("Go left!");
 }
@@ -193,37 +193,48 @@ void left(bool debug, int16_t in_carSpeed) {
 void right(bool debug, int16_t in_carSpeed) {
   analogWrite(ENA, in_carSpeed);
   analogWrite(ENB, in_carSpeed);
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
   if (debug)
     Serial.println("Go right!");
 }
 
 void forward_left(bool debug, int16_t in_carSpeed) {
-  analogWrite(ENA, in_carSpeed / 2);
-  analogWrite(ENB, in_carSpeed);
+  analogWrite(ENA, in_carSpeed);
+  analogWrite(ENB, in_carSpeed / 2);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
   if (debug)
-    Serial.println("Go right!");
+    Serial.println("Go forward left!");
 }
 
 void forward_right(bool debug, int16_t in_carSpeed) {
-  analogWrite(ENA, in_carSpeed);
-  analogWrite(ENB, in_carSpeed / 2);
+  analogWrite(ENA, in_carSpeed / 2);
+  analogWrite(ENB, in_carSpeed);
   digitalWrite(IN1, HIGH);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
   digitalWrite(IN4, HIGH);
   if (debug)
-    Serial.println("Go right!");
+    Serial.println("Go forward right!");
 }
 
 void back_left(bool debug, int16_t in_carSpeed) {
+  analogWrite(ENA, in_carSpeed);
+  analogWrite(ENB, in_carSpeed / 2);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  if (debug)
+    Serial.println("Go back left!");
+}
+
+void back_right(bool debug, int16_t in_carSpeed) {
   analogWrite(ENA, in_carSpeed / 2);
   analogWrite(ENB, in_carSpeed);
   digitalWrite(IN1, LOW);
@@ -231,18 +242,7 @@ void back_left(bool debug, int16_t in_carSpeed) {
   digitalWrite(IN3, HIGH);
   digitalWrite(IN4, LOW);
   if (debug)
-    Serial.println("Go right!");
-}
-
-void back_right(bool debug, int16_t in_carSpeed) {
-  analogWrite(ENA, in_carSpeed);
-  analogWrite(ENB, in_carSpeed / 2);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
-  if (debug)
-    Serial.println("Go right!");
+    Serial.println("Go back right!");
 }
 
 /*
@@ -277,22 +277,18 @@ void getIRData(void) {
     IR_PreMillis = millis();
     switch (results.value) {
     case f:
-    case UNKNOWN_F:
       func_mode = IRremote;
       mov_mode = FORWARD;
       break; /*forward*/
     case b:
-    case UNKNOWN_B:
       func_mode = IRremote;
       mov_mode = BACK;
       break; /*back*/
     case l:
-    case UNKNOWN_L:
       func_mode = IRremote;
       mov_mode = LEFT;
       break; /*left*/
     case r:
-    case UNKNOWN_R:
       func_mode = IRremote;
       mov_mode = RIGHT;
       break; /*right*/

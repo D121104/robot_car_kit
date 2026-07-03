@@ -749,6 +749,44 @@ void getDistance_xx(void) {
   CMD_Distance = getDistance(); // Ultrasonic measurement distance
 }
 
+/*
+  N100:command
+  CMD mode: Telemetry — Send full status JSON to app
+  Response: {"d":distance,"s":speed,"dir":direction,"m":mode}
+*/
+void CMD_Telemetry_Plus(void) {
+  uint16_t dist = getDistance();
+  // Get current direction as number
+  uint8_t dir = 0; // 0=stop
+  switch (mov_mode) {
+    case LEFT:          dir = 1; break;
+    case RIGHT:         dir = 2; break;
+    case FORWARD:       dir = 3; break;
+    case BACK:          dir = 4; break;
+    case STOP:          dir = 0; break;
+    case LEFT_FORWARD:  dir = 6; break;
+    case LEFT_BACK:     dir = 7; break;
+    case RIGHT_FORWARD: dir = 8; break;
+    case RIGHT_BACK:    dir = 9; break;
+    default:            dir = 0; break;
+  }
+  // Get current mode as number
+  uint8_t mode = 0; // 0=idle
+  switch (func_mode) {
+    case IDLE:               mode = 0; break;
+    case LineTeacking:       mode = 1; break;
+    case ObstaclesAvoidance: mode = 2; break;
+    case Bluetooth:          mode = 3; break;
+    case IRremote:           mode = 4; break;
+    default:                 mode = 5; break;
+  }
+  // Send telemetry as JSON
+  char buf[80];
+  sprintf(buf, "{\"d\":%d,\"s\":%d,\"dir\":%d,\"m\":%d}",
+          dist, carSpeed_rocker, dir, mode);
+  Serial.print(buf);
+}
+
 /*****************************************************End@CMD**************************************************************************************/
 /*
   Bluetooth serial port data acquisition and control command parsing
@@ -892,6 +930,10 @@ void getBTData_Plus(void) {
         CMD_CarDirectionxxx = doc["D1"];
         CMD_CarSpeedxxx = doc["D2"];
         Serial.print('{' + CommandSerialNumber + "_ok}");
+      } break;
+      case 100: /*Telemetry query  processing <command: N 100>*/
+      {
+        CMD_Telemetry_Plus();
       } break;
       default:
         break;
